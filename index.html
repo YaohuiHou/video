@@ -1,0 +1,102 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <title>视频播放</title>
+    <meta name="keywords" content="" />
+    <meta name="description" content="" />
+    <meta name="apple-mobile-web-app-capable" content="no" />
+    <meta name="format-detection" content="telephone=no">
+    <link rel="stylesheet" href="./css/index.css">
+    <script>
+        var phoneScale = parseInt(window.screen.width) / 750;
+        if (/Android (\d+\.\d+)/.test(navigator.userAgent)) {
+            if (parseFloat(RegExp.$1) > 2.3) {
+                document.write('<meta name="viewport" content="width=750, minimum-scale=' + phoneScale + ', maximum-scale=' + phoneScale + ', target-densitydpi=device-dpi" />');
+            } else {
+                document.write('<meta name="viewport" content="width=750, target-densitydpi=device-dpi" />');
+            }
+
+        } else {
+            document.write('<meta name="viewport" content="width=750,user-scalable=no, minimum-scale=' + phoneScale + ', maximum-scale=' + phoneScale + '" />');
+        }
+    </script>
+</head>
+<!-- http://blog.csdn.net/JJHuiQ/article/details/78478576?locationNum=8&fps=1 -->
+
+<body>
+    <!-- loading -->
+    <div class="loading">
+        <span>60%</span>
+    </div>
+    <div class="video hint" align="center">
+        <!-- <video id="video" x5-video-player-type="h5" webkit-playsinline="true" playsinline="true" x-webkit-airplay="allow" preload="auto" autobufer="true" width="100%" height="100%" src="./video/video.mp4"></video> -->
+        <video id="video" style="object-fit: fill;width: 100%;height: 100%;" preload="auto" playsinline="true" webkit-playsinline="true" x-webkit-airplay="allow" airplay="allow" x5-video-player-type="h5" x5-video-player-fullscreen="true" x5-video-orientation="portrait"
+            src="./video/video.mp4" poster="./video/loading.jpg"></video>
+    </div>
+    <!-- 展示图 -->
+    <div class="show-img"></div>
+</body>
+<script src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
+<script>
+    var video = document.querySelector('#video');
+
+    // 是否加载完闭
+    var num = 0;
+    var some = [0, 12, 34, 45, 53, 67, 71, 76, 82, 86, 90, 96, 98, 99, 100];
+    var load = document.querySelector('.loading span');
+    var loading = document.querySelector('.loading');
+    var videoBox = document.querySelector('.video');
+    var timer = setInterval(function() {
+        load.innerHTML = some[num] + '%';
+        num++;
+        if (some[num] > 99) {
+            clearInterval(timer);
+            loading.classList.add('hide')
+        }
+    }, 80);
+    video.onloadedmetadata = function() {
+        loadIng()
+    }
+    video.onloadstart = function() {
+        loadIng()
+    };
+
+    function loadIng() {
+        clearInterval(timer);
+        load.innerHTML = '100%';
+        loading.classList.add('hide')
+        video.play();
+        videoBox.classList.remove('hint');
+    };
+
+    // 是否播放完成
+    // video.ended
+    video.onended = function() {
+        video.classList.add('transparent');
+        document.querySelector('.show-img').classList.add('show');
+    }
+
+    // 微信播放
+    if (/MicroMessenger/i.test(navigator.userAgent)) {
+        wx.ready(function() {
+                video.play()
+            })
+            // 微信自动播放
+        document.addEventListener("WeixinJSBridgeReady", function() {
+            video.play();
+        }, false)
+    } else {
+        video.play();
+    }
+
+
+    // 触摸播放
+    videoBox.addEventListener('click', function() {
+        videoBox.classList.remove('hint');
+        video.play();
+    })
+</script>
+
+</html>
